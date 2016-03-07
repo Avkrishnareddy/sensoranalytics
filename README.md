@@ -15,4 +15,4 @@
 
 ###Example run command
 
-`bin/spark-submit --class com.rakesh.spark.streaming.StreamingMain --packages com.datastax.spark:spark-cassandra-connector_2.10:1.5.0-M3,org.apache.spark:spark-streaming-kafka_2.10:1.5.2 --master local[2] /home/madhu/Dev/wifianalytics/target/pack/lib/core_2.10-0.1.jar wifianalytics 15 60 60`
+`bin/spark-submit --class com.shashi.spark.streaming.StreamingMain --packages com.datastax.spark:spark-cassandra-connector_2.10:1.5.0-M3,org.apache.spark:spark-streaming-kafka_2.10:1.5.2 --master local[2] /home/madhu/Dev/wifianalytics/target/pack/lib/core_2.10-0.1.jar wifianalytics 15 60 60`
