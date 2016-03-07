@@ -1,4 +1,0 @@
-2015/10/09 02:00:00.010 ,India,Karnataka,Banglore,Success
-2015/10/09 07:00:00.053 ,India,Karnataka,Banglore,Failure
-2015/10/09 02:00:00.010 ,India,Karnataka,Banglore,Success
-2015/10/09 07:00:00.053 ,India,Karnataka,Banglore,Failure
