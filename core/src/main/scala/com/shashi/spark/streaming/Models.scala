@@ -5,20 +5,19 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import org.apache.commons.lang3.time.DateUtils
-import org.joda.time.DateTime
 
 
-case class SensorRecord(dateTime: DateTime,
+case class SensorRecord(dateTime: Timestamp,
                       country:String,
                       state:String,
                       city:String,
                       sensorStatus:String)
 
-case class CountryWiseStats(date: DateTime,country:String, count: BigInt)
+case class CountryWiseStats(date: String,country:String, count: BigInt)
 
-case class StateWiseStats(date: DateTime,country:String,state:String, count: BigInt)
+case class StateWiseStats(date: String,state:String, count: BigInt)
 
-case class CityWiseStats(date: DateTime,city:String,sensorStatus:String, count: BigInt)
+case class CityWiseStats(date: String,city:String,status:String, count: BigInt)
 
 
 object test
