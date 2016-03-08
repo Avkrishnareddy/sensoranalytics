@@ -92,3 +92,17 @@ def getStateHourStats(recentHours:Int)={
    %sql select hour,state,sum(count) as count from statestats where date=${Input} group by hour,state
 3. %sql select weekofyear(date) as week,state,sum(count) as count from statestats group by weekofyear(date),state
 4. %sql select month(date) as month,state,sum(count) as count from statestats group by month(date),state
+
+//City Stats
+1. Example input = 10
+   println(s"""%table city\tstatus\tcount""")
+      if(!getCityHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
+          getCityHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
+      }else{
+          println("No records found")
+      }
+
+2. Example input = "2016-03-07"
+   %sql select hour,city,status,sum(count) as count from citystats where date=${Input} group by hour,city,status
+3. %sql select weekofyear(date) as week,city,status,sum(count) as count from citystats group by weekofyear(date),city,status
+4. %sql select month(date) as month,city,status,sum(count) as count from citystats group by month(date),city,status

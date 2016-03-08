@@ -29,12 +29,22 @@ object StreamingMain {
   }
 
   def calculateStateStats(parsedDstream:DStream[SensorRecord],windowInterval:Int,slideInterval:Int):DStream[String]={
-    val countryAggregation = parsedDstream.map(eachRec=>((eachRec.dateTime,eachRec.state),1))
+    val stateAggregation = parsedDstream.map(eachRec=>((eachRec.dateTime,eachRec.state),1))
 
-    val resultStream = countryAggregation.window(Seconds(windowInterval),Seconds(slideInterval)).groupByKey().mapValues(_.size)
+    val resultStream = stateAggregation.window(Seconds(windowInterval),Seconds(slideInterval)).groupByKey().mapValues(_.size)
 
     resultStream.map{
       case ((dateTime:DateTime,state:String),count:Int) => dateTime.toString("yyyy-MM-dd HH:mm:ss")+","+state+","+count
+    }
+  }
+
+  def calculateCityStats(parsedDstream:DStream[SensorRecord],windowInterval:Int,slideInterval:Int):DStream[String]={
+    val cityAggregation = parsedDstream.map(eachRec=>((eachRec.dateTime,eachRec.city,eachRec.sensorStatus),1))
+
+    val resultStream = cityAggregation.window(Seconds(windowInterval),Seconds(slideInterval)).groupByKey().mapValues(_.size)
+
+    resultStream.map{
+      case ((dateTime:DateTime,city:String,sensorStatus:String),count:Int) => dateTime.toString("yyyy-MM-dd HH:mm:ss")+","+city+","+sensorStatus+","+count
     }
   }
 
@@ -64,6 +74,10 @@ object StreamingMain {
 
     calculateStateStats(parsedDstream,windowTime,slideTime).foreachRDD((outputRdd,time)=>{
       if(!outputRdd.isEmpty()) outputRdd.saveAsTextFile(streamingConfig.getString("output-dir")+"/stateStats/"+time.toString())
+    })
+
+    calculateCityStats(parsedDstream,windowTime,slideTime).foreachRDD((outputRdd,time)=>{
+      if(!outputRdd.isEmpty()) outputRdd.saveAsTextFile(streamingConfig.getString("output-dir")+"/cityStats/"+time.toString())
     })
 
     ssc.start()
