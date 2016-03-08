@@ -7,6 +7,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.joda.time.DateTime
+import org.apache.spark.streaming.kafka.KafkaUtils
+import kafka.serializer.StringDecoder
+
+
 
 
 object StreamingMain {
@@ -56,14 +60,24 @@ object StreamingMain {
     val batchTime = args(1).toInt
     val windowTime = args(2).toInt
     val slideTime = args(3).toInt
+    val topics = args(4)
+    val brokers = args(5)
 
     sparkConf.setMaster("local[2]")
 
     sparkConf.setAppName(appname)
 
+    val topicsSet = topics.split(",").toSet
+    val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers)
+
     val ssc = new StreamingContext(sparkConf,Seconds(batchTime))
 
-    val data = ssc.textFileStream(streamingConfig.getString("source-dir"))
+//    val data = ssc.textFileStream(streamingConfig.getString("source-dir"))
+
+    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+      ssc, kafkaParams, topicsSet)
+
+    val data = messages.map(_._2)
 
     val parsedDstream = data.map(SchemaParser.parse(_)).filter(_!=None).map(_.get)
 

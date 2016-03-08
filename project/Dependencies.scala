@@ -15,6 +15,7 @@ object Dependencies {
     val sparkSql = "org.apache.spark" %% "spark-sql" % V.sparkV
     val sparkStreaming = "org.apache.spark" %% "spark-streaming" % V.sparkV
     val sparkHive = "org.apache.spark" %% "spark-hive" % V.sparkV
+    val sparkKafka = "org.apache.spark" %% "spark-streaming-kafka" %V.sparkV
   }
 
 }

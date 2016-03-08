@@ -36,6 +36,7 @@ lazy val core = (project in file("core")).
       Libraries.sparkCore,
       Libraries.sparkSql,
       Libraries.sparkHive,
+      Libraries.sparkKafka,
       Libraries.sparkStreaming
     )
   )
