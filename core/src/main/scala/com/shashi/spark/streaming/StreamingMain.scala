@@ -71,9 +71,7 @@ object StreamingMain {
     val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers)
 
     val ssc = new StreamingContext(sparkConf,Seconds(batchTime))
-
-//    val data = ssc.textFileStream(streamingConfig.getString("source-dir"))
-
+    
     val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc, kafkaParams, topicsSet)
 
