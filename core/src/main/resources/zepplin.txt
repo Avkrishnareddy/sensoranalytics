@@ -7,6 +7,8 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.{Calendar, TimeZone}
 
 case class countryStats(date:Date,hour:Int,country:String,count:Int)
+case class stateStats(date:Date,hour:Int,state:String,count:Int)
+case class cityStats(date:Date,hour:Int,city:String,status:String,count:Int)
 
 val pattern = "yyyy-MM-dd HH:mm:ss"
 
@@ -47,10 +49,19 @@ val stateStatDF = sc.textFile("file:///home/hadoop/interests/streamingapp/stream
      stateStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),columns(1),columns(2).toInt)
     }).toDF
 
+val cityStatDF = sc.textFile("file:///home/hadoop/interests/streamingapp/streamingapp/core/src/main/resources/results/cityStats/*").map(eachStr=>{
+      val columns = eachStr.split(",")
+      val cal = Calendar.getInstance()
+      cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(columns(0)).getMillis)
+     cityStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),columns(1),columns(2),columns(3).toInt)
+    }).toDF
+
 
 countryStatDF.registerTempTable("countrystats")
 
 stateStatDF.registerTempTable("statestats")
+
+cityStatDF.registerTempTable("citystats")
 
 def getCountryHourStats(recentHours:Int)={
 
@@ -61,6 +72,12 @@ def getCountryHourStats(recentHours:Int)={
 
 def getStateHourStats(recentHours:Int)={
     sqlContext.sql(s"""select state,sum(count) from statestats where validHours($recentHours,date,hour) group by state""").map(output=>{
+        output(0)+"\t"+output(1)
+    })
+}
+
+def getCityHourStats(recentHours:Int)={
+    sqlContext.sql(s"""select city,status,sum(count) from statestats where validHours($recentHours,date,hour) group by city,status""").map(output=>{
         output(0)+"\t"+output(1)
     })
 }
