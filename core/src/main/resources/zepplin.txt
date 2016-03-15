@@ -5,8 +5,12 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import org.apache.commons.lang3.time.DateUtils
 import java.util.{Calendar, TimeZone}
+import com.datastax.spark.connector._
+import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
 case class countryStats(date:Date,hour:Int,country:String,count:Int)
+case class stateStats(date:Date,hour:Int,state:String,count:Int)
+case class cityStats(date:Date,hour:Int,city:String,status:String,count:Int)
 
 val pattern = "yyyy-MM-dd HH:mm:ss"
 
@@ -30,27 +34,30 @@ def recentHours(hour:Int,inputDate:Date,input:Int):Boolean=
 
 sqlContext.udf.register("validHours",recentHours _)
 
-
-val countryStatDF = sc.textFile("file:///home/hadoop/interests/streamingapp/streamingapp/core/src/main/resources/results/countryStats/*").map(eachStr=>{
-      val columns = eachStr.split(",")
+val countryStatDF =  sc.cassandraTable("sensoranalytics","countrystats").map(row=>{
       val cal = Calendar.getInstance()
-      cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(columns(0)).getMillis)
-     countryStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),columns(1),columns(2).toInt)
+      cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(row.get[String]("date")).getMillis)
+      countryStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),row.get[String]("country"),row.get[Int]("count"))
     }).toDF
 
+val stateStatDF = sc.cassandraTable("sensoranalytics","statestats").map(row=>{
+     val cal = Calendar.getInstance()
+     cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(row.get[String]("date")).getMillis)
+     stateStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),row.get[String]("state"),row.get[Int]("count"))
+    }).toDF
 
-
-val stateStatDF = sc.textFile("file:///home/hadoop/interests/streamingapp/streamingapp/core/src/main/resources/results/stateStats/*").map(eachStr=>{
-      val columns = eachStr.split(",")
-      val cal = Calendar.getInstance()
-      cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(columns(0)).getMillis)
-     stateStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),columns(1),columns(2).toInt)
+val cityStatDF = sc.cassandraTable("sensoranalytics","citystats").map(row=>{
+     val cal = Calendar.getInstance()
+     cal.setTimeInMillis(DateTimeFormat.forPattern(pattern).parseDateTime(row.get[String]("date")).getMillis)
+     cityStats(new Date(cal.getTimeInMillis),cal.get(Calendar.HOUR_OF_DAY),row.get[String]("city"),row.get[String]("status"),row.get[Int]("count"))
     }).toDF
 
 
 countryStatDF.registerTempTable("countrystats")
 
 stateStatDF.registerTempTable("statestats")
+
+cityStatDF.registerTempTable("citystats")
 
 def getCountryHourStats(recentHours:Int)={
 
@@ -65,14 +72,20 @@ def getStateHourStats(recentHours:Int)={
     })
 }
 
+def getCityHourStats(recentHours:Int)={
+    sqlContext.sql(s"""select city,status,sum(count) from citystats where validHours($recentHours,date,hour) group by city,status""").map(output=>{
+        output(0)+"\t"+output(1)+"\t"+output(2)
+    })
+}
+
 //Country Stats
 1. Example input = 10
    println(s"""%table country\tcount""")
-      if(!getCountryHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
-          getCountryHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
-      }else{
-          println("No records found")
-      }
+        if(!getCountryHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
+            getCountryHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
+        }else{
+            println("No records found")
+        }
 
 2. Example input = "2016-03-07"
    %sql select hour,country,sum(count) as count from countrystats where date=${Input} group by hour,country
@@ -82,11 +95,11 @@ def getStateHourStats(recentHours:Int)={
 //State Stats
 1. Example input = 10
    println(s"""%table state\tcount""")
-      if(!getStateHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
-          getStateHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
-      }else{
-          println("No records found")
-      }
+        if(!getStateHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
+            getStateHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
+        }else{
+            println("No records found")
+        }
 
 2. Example input = "2016-03-07"
    %sql select hour,state,sum(count) as count from statestats where date=${Input} group by hour,state
@@ -96,11 +109,11 @@ def getStateHourStats(recentHours:Int)={
 //City Stats
 1. Example input = 10
    println(s"""%table city\tstatus\tcount""")
-      if(!getCityHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
-          getCityHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
-      }else{
-          println("No records found")
-      }
+        if(!getCityHourStats(z.input("hour").asInstanceOf[String].toInt).isEmpty()){
+            getCityHourStats(z.input("hour").asInstanceOf[String].toInt).collect().foreach(println)
+        }else{
+            println("No records found")
+        }
 
 2. Example input = "2016-03-07"
    %sql select hour,city,status,sum(count) as count from citystats where date=${Input} group by hour,city,status

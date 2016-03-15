@@ -1,0 +1,9 @@
+CREATE KEYSPACE sensoranalytics WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+use sensoranalytics ;
+
+CREATE TABLE sensoranalytics.countrystats (date text ,country text,count int, PRIMARY KEY (date, country));
+
+CREATE TABLE sensoranalytics.statestats (date text ,state text,count int, PRIMARY KEY (date, state));
+
+CREATE TABLE sensoranalytics.citystats (date text ,city text,status text,count int, PRIMARY KEY (date, city,status));
