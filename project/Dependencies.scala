@@ -8,6 +8,7 @@ object Dependencies {
   object V {
     val sparkV="1.5.2"
     val cassandraConnectorV="1.5.0-M3"
+    val scalaTestV = "2.2.5"
   }
 
   object Libraries {   
@@ -18,6 +19,10 @@ object Dependencies {
     val sparkHive = "org.apache.spark" %% "spark-hive" % V.sparkV
     val sparkKafka = "org.apache.spark" %% "spark-streaming-kafka" %V.sparkV
     val cassandraConnector = "com.datastax.spark" % "spark-cassandra-connector_2.10" % V.cassandraConnectorV
+
+    //testing
+    val scalaTest = "org.scalatest" %% "scalatest" % V.scalaTestV % "test"
+
   }
 
 }

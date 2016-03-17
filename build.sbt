@@ -38,6 +38,7 @@ lazy val core = (project in file("core")).
       Libraries.sparkHive,
       Libraries.sparkKafka,
       Libraries.cassandraConnector,
+      Libraries.scalaTest,
       Libraries.sparkStreaming
     )
   )

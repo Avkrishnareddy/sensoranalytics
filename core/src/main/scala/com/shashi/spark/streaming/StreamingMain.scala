@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat
 
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.streaming._
-import com.rakesh.spark.streaming.dataloader.CassandraDataLoader
 import com.shashi.spark.streaming.dataloader.CassandraLoader
 import kafka.serializer.StringDecoder
 import org.apache.spark.SparkConf
