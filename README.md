@@ -27,3 +27,24 @@
 ###Example run command
 
 `bin/spark-submit --class com.shashi.spark.streaming.StreamingMain --packages com.datastax.spark:spark-cassandra-connector_2.10:1.5.0-M3,org.apache.spark:spark-streaming-kafka_2.10:1.5.2 --master local[2] /home/hadoop/interests/streamingapp/streamingapp/target/pack/lib/core_2.10-0.1.jar wifianalytics 15 60 60`
+
+## Integrating with flume
+
+
+### Configuration
+The sample configuration is available at src/main/resources/flume-conf.properties. Update the below properties to suite
+your environment
+
+    * a1.sources.r1.command - Point to the file which needs to be tailed. -F option takes care of rotation
+    * a1.sinks.k1.brokerList - Kafka broker list
+    * a1.sinks.k1.topic - Topic to listen to
+
+### Running
+
+Run the below command to push data from the flume. Configuration for flume is available in src/main/resources
+
+Format
+ `bin/flume-ng agent -n $agent_name -c conf -f conf/flume-conf.properties.template`
+ 
+Example
+ ` bin/flume-ng agent -n a1 --conf conf -c conf -f conf/flume-conf.properties -Dflume.root.logger=INFO,console`
