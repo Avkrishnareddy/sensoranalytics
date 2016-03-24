@@ -27,9 +27,9 @@ class CountryAggregator extends Aggregator[SensorRecord,CountryWiseStats]{
           case ((date,country),count) => s"'$country'"
         }.distinct().collect().toList.mkString(",")
 
-        val countrystatsdf = sqlContext.read.format("org.apache.spark.sql.cassandra")
-          .options(Map( "table" -> "countrystats", "keyspace" -> "sensoranalytics"))
-          .load()
+        val options = Map("keyspace" -> "sensoranalytics", "table" -> "countrystats")
+        val countrystatsdf = dataLoader.getData(options,eachRdd.sparkContext).get
+
         countrystatsdf.registerTempTable("countrystats")
         val existingRdd = sqlContext.sql(s"select * from countrystats where date in ($datesList) and country in ($countryList)").map {
           case Row(date: String, country: String, count: Int) => ((date, country), count)

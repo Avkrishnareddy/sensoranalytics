@@ -8,6 +8,6 @@ import scala.util.Try
 /**
  * Created by shashidhar on 17/3/16.
  */
-trait DataLoader {
+trait DataLoader extends Serializable{
   def getData(option: Map[String,String],sparkContext: SparkContext):Try[DataFrame]
 }

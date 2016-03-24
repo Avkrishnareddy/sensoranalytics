@@ -58,7 +58,7 @@ class CountryStatsTest extends WordSpec with SparkStreamingSpec  with Matchers w
         collector.length shouldEqual 1
         collector.filter(value => {
           value.country=="India" && value.date=="2016-03-15 07:00:00"
-        }).head.count shouldEqual 1+39
+        }).head.count shouldEqual 1+10
       }
     }
   }

@@ -31,10 +31,11 @@ class CityAggregator extends Aggregator[SensorRecord,CityWiseStats]{
           case ((date,city,status),count) => s"'$status'"
         }.distinct().collect().toList.mkString(",")
 
-        val statestatsdf = sqlContext.read.format("org.apache.spark.sql.cassandra")
-          .options(Map( "table" -> "citystats", "keyspace" -> "sensoranalytics"))
-          .load()
-        statestatsdf.registerTempTable("citystats")
+        val options = Map("keyspace" -> "sensoranalytics", "table" -> "citystats")
+        val citystatsdf = dataLoader.getData(options,eachRdd.sparkContext).get
+
+        citystatsdf.registerTempTable("citystats")
+
         val existingRdd = sqlContext.sql(s"select * from citystats where date in ($datesList) and city in ($cityList) and status in ($statusList)").map {
           case Row(date: String, city: String,status: String, count: Int) => ((date, city,status), count)
         }

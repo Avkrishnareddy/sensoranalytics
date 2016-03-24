@@ -27,9 +27,9 @@ class StateAggregator extends Aggregator[SensorRecord,StateWiseStats]{
           case ((date,state),count) => s"'$state'"
         }.distinct().collect().toList.mkString(",")
 
-        val statestatsdf = sqlContext.read.format("org.apache.spark.sql.cassandra")
-          .options(Map( "table" -> "statestats", "keyspace" -> "sensoranalytics"))
-          .load()
+        val options = Map("keyspace" -> "sensoranalytics", "table" -> "statestats")
+        val statestatsdf = dataLoader.getData(options,eachRdd.sparkContext).get
+
         statestatsdf.registerTempTable("statestats")
         val existingRdd = sqlContext.sql(s"select * from statestats where date in ($datesList) and state in ($stateList)").map {
           case Row(date: String, state: String, count: Int) => ((date, state), count)
