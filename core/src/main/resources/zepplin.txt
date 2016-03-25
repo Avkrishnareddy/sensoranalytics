@@ -77,8 +77,8 @@ def getStateHourStats(recentHours:Int)={
 }
 
 def getCityHourStats(recentHours:Int)={
-    sqlContext.sql(s"""select city,status,sum(count) from statestats where validHours($recentHours,date,hour) group by city,status""").map(output=>{
-        output(0)+"\t"+output(1)
+    sqlContext.sql(s"""select city,status,sum(count) from CITYstats where validHours($recentHours,date,hour) group by city,status""").map(output=>{
+        output(0)+"\t"+output(1)+"\t"+output(2)
     })
 }
 
