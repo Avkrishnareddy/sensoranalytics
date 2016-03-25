@@ -4,6 +4,9 @@
 * Java
 * SBT
 * Spark
+* Kafka
+* Cassandra
+* Flume
 
 #Building and Running Streaming Application
 
